@@ -789,7 +789,7 @@ public class BotPlayer extends ServerPlayer {
             }
 
             boolean cleanHit = true;
-            if ((float) this.getInvulnerableTime() > (float) HeroBotSettings.damageTicks && !damageSource.is(DamageTypeTags.BYPASSES_COOLDOWN)) {
+            if ((float) this.damageCooldownTime > (float) HeroBotSettings.damageTicks && !damageSource.is(DamageTypeTags.BYPASSES_COOLDOWN)) {
                 if (finalDamage <= this.lastHurt) {
                     return false;
                 }
@@ -799,7 +799,7 @@ public class BotPlayer extends ServerPlayer {
                 cleanHit = false;
             } else {
                 this.lastHurt = finalDamage;
-                this.setInvulnerableTime(HeroBotSettings.damageInvulnerableTicks());
+                this.damageCooldownTime = HeroBotSettings.damageInvulnerableTicks();
                 this.actuallyHurt(serverLevel, damageSource, finalDamage);
                 if (!blocked) {
                     this.hurtDuration = HeroBotSettings.damageTicks;
