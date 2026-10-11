@@ -32,3 +32,27 @@ jobs:
         with:
           name: herobot-fabric-26.3
           path: herobot-mod/build/libs/*.jar
+      - name: Report errors 1
+        if: failure()
+        run: |
+          grep -E "(: error:|error: |e: |\\[ERROR\\]|What went wrong|Could not|> )" build.log | grep -v "^> Task" | sed -n '1,30p' > errs.txt || true
+          i=0; while IFS= read -r line; do
+            lvl=error; [ $i -ge 10 ] && lvl=warning; [ $i -ge 20 ] && lvl=notice
+            echo "::$lvl title=e$(( 1 + i ))::${line}"; i=$((i+1))
+          done < errs.txt
+      - name: Report errors 2
+        if: failure()
+        run: |
+          grep -E "(: error:|error: |e: |\\[ERROR\\]|What went wrong|Could not|> )" build.log | grep -v "^> Task" | sed -n '31,60p' > errs.txt || true
+          i=0; while IFS= read -r line; do
+            lvl=error; [ $i -ge 10 ] && lvl=warning; [ $i -ge 20 ] && lvl=notice
+            echo "::$lvl title=e$(( 31 + i ))::${line}"; i=$((i+1))
+          done < errs.txt
+      - name: Report errors 3
+        if: failure()
+        run: |
+          grep -E "(: error:|error: |e: |\\[ERROR\\]|What went wrong|Could not|> )" build.log | grep -v "^> Task" | sed -n '61,90p' > errs.txt || true
+          i=0; while IFS= read -r line; do
+            lvl=error; [ $i -ge 10 ] && lvl=warning; [ $i -ge 20 ] && lvl=notice
+            echo "::$lvl title=e$(( 61 + i ))::${line}"; i=$((i+1))
+          done < errs.txt
