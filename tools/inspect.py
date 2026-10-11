@@ -40,6 +40,16 @@ for cls, pre in [("net.minecraft.world.entity.LivingEntity","knockback"),("net.m
         lines.append(f"{cls.split('.')[-1]}.{k} fields: " + ", ".join(keep)[:800])
 src = javap("net.minecraft.world.entity.Entity")
 lines.append("Entity bool fields: " + ", ".join(sorted(set(re.findall(r"// Field (\w*(?:[Ss]ync|[Hh]urt|[Mm]arked)\w*):Z", src)))))
+lines=[]
+for cls in ["net.minecraft.world.entity.LivingEntity","net.minecraft.world.entity.Entity","net.minecraft.world.entity.player.Player","net.minecraft.server.level.ServerPlayer"]:
+    full = subprocess.run(["javap","-p","-classpath",jar,cls],capture_output=True,text=True).stdout
+    for l in full.split("\n"):
+        if re.search(r"[Dd]amageCooldown|[Ii]nvulnerableTime|isTemporarilyInvulnerable|isInvulnerableTo|invulnerable", l):
+            lines.append(cls.split(".")[-1]+": "+l.strip())
+    users = methods(javap(cls))
+    for k,v in users.items():
+        h=[x for x in v if "damageCooldown" in x or "DamageCooldown" in x or "isTemporarilyInvulnerable" in x]
+        if h: lines.append(cls.split(".")[-1]+"."+k.split("(")[0]+" -> "+", ".join(sorted(set(x.split(".")[-1].split(":")[0] for x in h))))
 for i, l in enumerate(lines[:48]):
     lvl = "error" if i < 10 else ("warning" if i < 20 else "notice")
     print(f"::{lvl} title={tag}-{i}::{l[:900]}")
