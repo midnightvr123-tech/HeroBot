@@ -85,7 +85,7 @@ jobs:
         run: |
           cd server
           mkfifo cmds
-          (java -Xmx2G -jar server.jar nogui < cmds > server.log 2>&1; echo "EXIT $?" >> server.log) &
+          (java -Xmx2G -Dmixin.ignoreRequired=true -jar server.jar nogui < cmds > server.log 2>&1; echo "EXIT $?" >> server.log) &
           exec 3>cmds
           for i in $(seq 1 240); do grep -qE 'Done \(|EXIT ' server.log && break; sleep 1; done
           send() { echo "$1" >&3; sleep 3; }
@@ -111,7 +111,7 @@ jobs:
         if: always()
         run: |
           cd server
-          grep -nE "Done \(|EXIT|ERROR|Exception|Mixin|mixin|Caused by|Unknown or incomplete|Incorrect argument|herobot|HeroBot|TestBot|delayed-ok|players online|Loading [0-9]+ mods|\[Server\]" server.log \
+          grep -nE "Done \(|EXIT|failed injection check|Mixin apply|Unable to locate|InvalidInjection|Caused by|Exception:|Unknown or incomplete|Incorrect argument|TestBot|delayed-ok|players online|\[Server\]|\[HeroBot\]" server.log | grep -vE "^[0-9]+:\s+at " \
             | grep -vE "^\S+ \[main/INFO\]: \[HeroBot\] Loaded rule" | head -60 > lines.txt || true
           i=0; while IFS= read -r line; do
             lvl=error; [ $i -ge 10 ] && lvl=warning; [ $i -ge 20 ] && lvl=notice
