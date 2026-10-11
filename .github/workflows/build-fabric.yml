@@ -56,3 +56,75 @@ jobs:
             lvl=error; [ $i -ge 10 ] && lvl=warning; [ $i -ge 20 ] && lvl=notice
             echo "::$lvl title=e$(( 61 + i ))::${line}"; i=$((i+1))
           done < errs.txt
+
+  smoke-test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/download-artifact@v4
+        with:
+          name: herobot-fabric-26.3
+          path: jars
+      - name: Set up a Fabric 26.3 server
+        run: |
+          mkdir -p server/mods && cd server
+          INST=$(curl -s https://meta.fabricmc.net/v2/versions/installer | jq -r '.[0].version')
+          curl -sSL -o server.jar "https://meta.fabricmc.net/v2/versions/loader/26.3/0.19.5/$INST/server/jar"
+          FAPI=$(curl -s 'https://api.modrinth.com/v2/project/fabric-api/version?game_versions=%5B%2226.3%22%5D&loaders=%5B%22fabric%22%5D' | jq -r '.[0].files[0].url')
+          curl -sSL -o mods/fabric-api.jar "$FAPI"
+          cp $(ls ../jars/*.jar | grep -v sources) mods/
+          ls -la mods
+          echo "eula=true" > eula.txt
+          printf "online-mode=false\nlevel-type=minecraft\\:flat\nspawn-protection=0\n" > server.properties
+      - name: Start server, spawn a bot, run HeroBot commands
+        timeout-minutes: 10
+        run: |
+          cd server
+          mkfifo cmds
+          (java -Xmx2G -jar server.jar nogui < cmds > server.log 2>&1; echo "EXIT $?" >> server.log) &
+          exec 3>cmds
+          for i in $(seq 1 240); do grep -qE 'Done \(|EXIT ' server.log && break; sleep 1; done
+          send() { echo "$1" >&3; sleep 3; }
+          send "herobot"
+          send "playerspawn TestBot at 0 -50 0 facing 180 0"
+          send "player TestBot jump once"
+          send "player TestBot attack once"
+          send "player TestBot use once"
+          send "player TestBot sprint"
+          send "player TestBot move forward"
+          send "player TestBot stop"
+          send "player TestBot hotbar 2"
+          send "herobot shieldStunning true perm"
+          send "delayed tickDelay 5 command say delayed-ok"
+          send "player TestBot itemCd minecraft:shield"
+          send "damage TestBot 2 minecraft:generic"
+          sleep 5
+          send "list"
+          send "stop"
+          for i in $(seq 1 60); do grep -q 'EXIT ' server.log && break; sleep 1; done
+          tail -5 server.log
+      - name: Report server log
+        if: always()
+        run: |
+          cd server
+          grep -nE "Done \(|EXIT|ERROR|Exception|Mixin|mixin|Caused by|Unknown or incomplete|Incorrect argument|herobot|HeroBot|TestBot|delayed-ok|players online|Loading [0-9]+ mods|\[Server\]" server.log \
+            | grep -vE "^\S+ \[main/INFO\]: \[HeroBot\] Loaded rule" | head -60 > lines.txt || true
+          i=0; while IFS= read -r line; do
+            lvl=error; [ $i -ge 10 ] && lvl=warning; [ $i -ge 20 ] && lvl=notice
+            [ $i -ge 30 ] && break
+            echo "::$lvl title=s$(( 1 + i ))::${line}"; i=$((i+1))
+          done < lines.txt
+      - name: Report server log part 2
+        if: always()
+        run: |
+          cd server
+          i=0; sed -n '31,60p' lines.txt | while IFS= read -r line; do
+            lvl=error; [ $i -ge 10 ] && lvl=warning; [ $i -ge 20 ] && lvl=notice
+            echo "::$lvl title=s$(( 31 + i ))::${line}"; i=$((i+1))
+          done
+      - name: Fail if the server crashed
+        run: grep -q 'Done (' server/server.log && ! grep -qE 'Mixin apply failed|InvalidInjectionException|MixinApplyError' server/server.log
