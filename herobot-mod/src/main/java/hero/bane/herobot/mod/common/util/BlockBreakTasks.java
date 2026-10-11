@@ -1,5 +1,7 @@
 package hero.bane.herobot.mod.common.util;
 
+import net.minecraft.world.item.component.SwingAnimation;
+
 import hero.bane.herobot.mod.common.control.PlayerControllers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

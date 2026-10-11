@@ -1,5 +1,7 @@
 package hero.bane.herobot.mod.common.bot;
 
+import net.minecraft.world.item.component.SwingAnimation;
+
 import hero.bane.herobot.common.ping.PingDelayOptions;
 import hero.bane.herobot.common.ping.PingDelays;
 import hero.bane.herobot.mod.common.bot.connection.ServerPlayerInterface;

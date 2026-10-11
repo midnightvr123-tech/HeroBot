@@ -1,5 +1,7 @@
 package hero.bane.herobot.mod.client.control;
 
+import net.minecraft.world.item.component.SwingAnimation;
+
 import com.mojang.blaze3d.platform.InputConstants;
 import hero.bane.herobot.mod.common.bot.BotPlayerActionPack.Action;
 import hero.bane.herobot.mod.common.bot.BotPlayerActionPack.ActionType;
