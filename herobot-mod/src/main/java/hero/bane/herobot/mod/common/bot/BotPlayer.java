@@ -789,7 +789,7 @@ public class BotPlayer extends ServerPlayer {
             }
 
             boolean cleanHit = true;
-            if ((float) this.invulnerableTime > (float) HeroBotSettings.damageTicks && !damageSource.is(DamageTypeTags.BYPASSES_COOLDOWN)) {
+            if ((float) this.getInvulnerableTime() > (float) HeroBotSettings.damageTicks && !damageSource.is(DamageTypeTags.BYPASSES_COOLDOWN)) {
                 if (finalDamage <= this.lastHurt) {
                     return false;
                 }
@@ -799,7 +799,7 @@ public class BotPlayer extends ServerPlayer {
                 cleanHit = false;
             } else {
                 this.lastHurt = finalDamage;
-                this.invulnerableTime = HeroBotSettings.damageInvulnerableTicks();
+                this.setInvulnerableTime(HeroBotSettings.damageInvulnerableTicks());
                 this.actuallyHurt(serverLevel, damageSource, finalDamage);
                 if (!blocked) {
                     this.hurtDuration = HeroBotSettings.damageTicks;
@@ -981,7 +981,7 @@ public class BotPlayer extends ServerPlayer {
 
     @Override
     protected void blockUsingItem(@NonNull ServerLevel serverLevel, LivingEntity livingEntity,
-                                  @NonNull DamageSource damageSource, float damage) {
+                                  @NonNull DamageSource damageSource, float damage, boolean fullyBlocked) {
         ItemStack itemStack = this.getItemBlockingWith();
         BlocksAttacks blocksAttacks = itemStack != null ? itemStack.get(DataComponents.BLOCKS_ATTACKS) : null;
         float f = livingEntity.getSecondsToDisableBlocking();

@@ -16,9 +16,7 @@ public final class ChatCapture {
             return content1.getString();
         }
         if (packet instanceof ClientboundPlayerChatPacket p) {
-            Component content = p.unsignedContent() != null
-                    ? p.unsignedContent()
-                    : Component.literal(p.body().content());
+            Component content = p.unsignedContent().orElseGet(() -> Component.literal(p.body().content()));
             return p.chatType().decorate(content).getString();
         }
         if (packet instanceof ClientboundDisguisedChatPacket(

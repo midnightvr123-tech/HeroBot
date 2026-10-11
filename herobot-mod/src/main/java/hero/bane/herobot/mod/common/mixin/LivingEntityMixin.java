@@ -69,7 +69,7 @@ public abstract class LivingEntityMixin extends Entity {
     )
     private void modifyKnockback(Entity entity, DamageSource damageSource, CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (entity instanceof LivingEntity target && target.invulnerableTime < HeroBotSettings.damageInvulnerableTicks()) {
+        if (entity instanceof LivingEntity target && target.getInvulnerableTime() < HeroBotSettings.damageInvulnerableTicks()) {
             cir.setReturnValue(0.0F);
             return;
         }
@@ -138,7 +138,7 @@ public abstract class LivingEntityMixin extends Entity {
         if (blockedHit) {
             blockedHit = false;
             if (HeroBotSettings.shieldStunning) {
-                this.invulnerableTime = 0;
+                ((LivingEntity) (Object) this).setInvulnerableTime(0);
                 return false;
             } else {
                 LivingEntity self = (LivingEntity) (Object) this;

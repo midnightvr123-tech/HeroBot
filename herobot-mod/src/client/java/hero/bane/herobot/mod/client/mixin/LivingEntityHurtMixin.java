@@ -16,7 +16,7 @@ public class LivingEntityHurtMixin {
     @Inject(method = "handleDamageEvent", at = @At("TAIL"))
     private void damageEventHurtLength(DamageSource damageSource, CallbackInfo ci) {
         if (stretchHurtAnimation()) {
-            ((LivingEntity) (Object) this).invulnerableTime = HeroBotSettings.damageInvulnerableTicks();
+            ((LivingEntity) (Object) this).setInvulnerableTime(HeroBotSettings.damageInvulnerableTicks());
         }
     }
 

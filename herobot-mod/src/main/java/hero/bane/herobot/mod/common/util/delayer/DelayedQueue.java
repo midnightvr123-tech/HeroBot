@@ -76,34 +76,23 @@ public final class DelayedQueue {
 
                 if (entity == null) return;
 
-                source = new CommandSourceStack(
-                        server,
-                        entity.position(),
-                        entity.getRotationVector(),
-                        (ServerLevel) entity.level(),
-                        PermissionSet.ALL_PERMISSIONS,
-                        entity.getName().getString(),
-                        entity.getDisplayName(),
-                        server,
-                        entity
-                ).withCallback(CommandResultCallback.EMPTY);
+                source = server.createCommandSourceStack()
+                        .withEntity(entity)
+                        .withPosition(entity.position())
+                        .withRotation(entity.getRotationVector())
+                        .withLevel((ServerLevel) entity.level())
+                        .withPermission(PermissionSet.ALL_PERMISSIONS).withCallback(CommandResultCallback.EMPTY);
 
             } else if (executor.type == ExecutorType.COMMAND_BLOCK) {
 
                 ServerLevel level = server.getLevel(executor.dimension);
                 if (level == null) return;
 
-                source = new CommandSourceStack(
-                        server,
-                        Vec3.atCenterOf(executor.pos),
-                        Vec2.ZERO,
-                        level,
-                        PermissionSet.ALL_PERMISSIONS,
-                        "@",
-                        Component.literal("@"),
-                        server,
-                        null
-                ).withCallback(CommandResultCallback.EMPTY);
+                source = server.createCommandSourceStack()
+                        .withPosition(Vec3.atCenterOf(executor.pos))
+                        .withRotation(Vec2.ZERO)
+                        .withLevel(level)
+                        .withPermission(PermissionSet.ALL_PERMISSIONS).withCallback(CommandResultCallback.EMPTY);
 
             } else {
 

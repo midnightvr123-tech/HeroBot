@@ -53,7 +53,7 @@ public final class BlockBreaker {
         if (creative) {
             player.gameMode.handleBlockBreakAction(bp,
                     ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, face, world.getMaxY(), -1);
-            player.swing(InteractionHand.MAIN_HAND, true);
+            player.swingAndResetAttackStrength(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             player.resetLastActionTime();
             return true;
         }

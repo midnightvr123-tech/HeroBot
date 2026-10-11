@@ -186,9 +186,9 @@ public final class ClientPlayerController implements PlayerController {
             return;
         }
         switch (type) {
-            case SWING -> { if (p != null) p.swing(InteractionHand.MAIN_HAND); }
-            case DROP_ITEM -> { if (p != null && p.drop(false)) p.swing(InteractionHand.MAIN_HAND); }
-            case DROP_STACK -> { if (p != null && p.drop(true)) p.swing(InteractionHand.MAIN_HAND); }
+            case SWING -> { if (p != null) p.swingAndResetAttackStrength(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false); }
+            case DROP_ITEM -> { if (p != null && p.drop(false)) p.swingAndResetAttackStrength(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false); }
+            case DROP_STACK -> { if (p != null && p.drop(true)) p.swingAndResetAttackStrength(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false); }
         }
     }
 

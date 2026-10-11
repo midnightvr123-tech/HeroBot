@@ -94,13 +94,13 @@ public final class BlockBreakTasks {
             task.started = true;
             player.gameMode.handleBlockBreakAction(task.pos,
                     ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, task.face, world.getMaxY(), -1);
-            player.swing(InteractionHand.MAIN_HAND, true);
+            player.swingAndResetAttackStrength(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             player.resetLastActionTime();
             return !world.getBlockState(task.pos).isAir();
         }
 
         task.damage += state.getDestroyProgress(player, world, task.pos);
-        player.swing(InteractionHand.MAIN_HAND, true);
+        player.swingAndResetAttackStrength(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
         player.resetLastActionTime();
         if (task.damage >= 1.0f) {
             player.gameMode.handleBlockBreakAction(task.pos,

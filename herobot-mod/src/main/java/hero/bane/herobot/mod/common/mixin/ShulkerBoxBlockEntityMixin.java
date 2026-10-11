@@ -16,7 +16,7 @@ public class ShulkerBoxBlockEntityMixin {
     ))
     private PushReaction getPistonBehaviourOfNoClipPlayers(Entity entity) {
         if (ModRules.isCreativeNoClipFlying(entity))
-            return PushReaction.IGNORE;
+            return PushReaction.IGNORE_ENTITY;
         return entity.getPistonPushReaction();
     }
 }
