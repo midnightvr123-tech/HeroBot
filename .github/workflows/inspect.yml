@@ -1,0 +1,35 @@
+name: Inspect combat code (26.2 vs 26.3)
+
+on:
+  push:
+    branches: [port-26.3]
+    paths: ['.github/workflows/inspect.yml', 'tools/inspect.py']
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ref: ['4d13ed1', 'port-26.3']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git checkout ${{ matrix.ref }} -- gradle/libs.versions.toml || true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Resolve Minecraft jar
+        run: |
+          chmod +x gradlew
+          ./gradlew :herobot-mod:compileJava --no-daemon -q || true
+          find ~/.gradle .gradle -name 'minecraft-*common*.jar' -o -name 'minecraft-merged*.jar' 2>/dev/null | grep -v sources | head -5
+      - name: Report
+        run: |
+          JAR=$(find ~/.gradle .gradle -name 'minecraft-*common*.jar' 2>/dev/null | grep -v sources | head -1)
+          [ -z "$JAR" ] && JAR=$(find ~/.gradle .gradle -name 'minecraft-merged*.jar' 2>/dev/null | grep -v sources | head -1)
+          echo "jar=$JAR"
+          python3 tools/inspect.py "$JAR" "${{ matrix.ref }}"
